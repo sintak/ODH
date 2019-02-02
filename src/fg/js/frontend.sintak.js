@@ -138,18 +138,24 @@ class ODHFront {
     }
 
     async api_addNote(params) {
-        let { nindex, dindex, context } = params;
+        let { nindex, dindex, context, note } = params;
 
         let notedef = Object.assign({}, this.notes[nindex]);
-        notedef.definition = this.notes[nindex].css + this.notes[nindex].definitions[dindex];
-        notedef.definitions = this.notes[nindex].css + this.notes[nindex].definitions.join('<hr>');
+        if (nindex == this.notes.length-1) {// 最后一个为自己的note
+            console.log('nindex == this.notes.length-1', nindex, dindex);
+            notedef.definition = note
+            notedef.definitions = this.notes[nindex].css + this.notes[nindex].definitions.join('<hr>');
+        } else {
+            notedef.definition = this.notes[nindex].css + this.notes[nindex].definitions[dindex];
+            notedef.definitions = this.notes[nindex].css + this.notes[nindex].definitions.join('<hr>');
+        }
         notedef.sentence = context;
         notedef.url = window.location.href;
         let response = await addNote(notedef);
         this.popup.sendMessage('setActionState', { response, params });
 
         // by sintak
-        console.log("frontend.js api_addNote");
+        console.log("frontend.js api_addNote", notedef);
         this.comm.dispatchPageEvent({type: 7, param: {cmd:"addNote", param: notedef}});
     }
 
@@ -205,10 +211,29 @@ class ODHFront {
                     item[key] = item[key] ? item[key] : tmpl[key];
                 }
             }
+
+            /// 增加一个空定义占位
+            // tmpl['definitions'] = [].concat('<div id="odh-container-note"></div>');
+            // tmpl['definitions'] = [].concat('');
+            let obj2 = Object.assign({}, tmpl);
+            obj2['definitions'] = [''];
+            result = result.concat(obj2);
+
             return result;
         } else { // if 'result' is simple string, then return standard template.
-            tmpl['definitions'] = [].concat(result);
-            return [tmpl];
+            // tmpl['definitions'] = [].concat(result);
+            // return [tmpl];
+
+
+            // tmpl['definitions'] = tmpl['definitions'].concat('<div id="odh-container-note"></div>');/// 增加一个空定义占位
+            // tmpl['definitions'] = tmpl['definitions'].concat('');/// 增加一个空定义占位
+
+            let obj = Object.assign({}, tmpl);
+            obj['definitions'] = [].concat(result);
+            let obj2 = Object.assign({}, tmpl);
+            obj2['definitions'] = [''];
+            var list = [obj, obj2];
+            return list;
         }
 
     }
@@ -240,13 +265,24 @@ class ODHFront {
                     <span class="odh-extra">${note.extrainfo}</span>
                 </div>`;
             for (const [dindex, definition] of note.definitions.entries()) {
-                let button = services == 'none' ? '' : `<img ${imageclass} data-nindex="${nindex}" data-dindex="${dindex}" src="${chrome.runtime.getURL('fg/img/'+ image)}" />`;
-                content += `<div class="odh-definition">${button}${definition}</div>`;
+                if (nindex == notes.length -1) {// 最后一个为自己手动的note
+                    let button = services == 'none' ? '' : `<img ${imageclass} data-nindex="${nindex}" data-dindex="${dindex}" src="${chrome.runtime.getURL('fg/img/'+ image)}" />`;
+                    let handNote = `<div id="odh-container-note"></div>`;
+                    content += `<div class="odh-definition">${button}${handNote}</div>`;
+                } else {
+                    let button = services == 'none' ? '' : `<img ${imageclass} data-nindex="${nindex}" data-dindex="${dindex}" src="${chrome.runtime.getURL('fg/img/'+ image)}" />`;
+                    content += `<div class="odh-definition">${button}${definition}</div>`;
+                }
             }
             content += '</div>';
         }
         //content += `<textarea id="odh-context" class="odh-sentence">${this.sentence}</textarea>`;
         content += `<div id="odh-container" class="odh-sentence"></div>`;
+
+        // let button = services == 'none' ? '' : `<img ${imageclass} src="${chrome.runtime.getURL('fg/img/'+ image)}" />`;
+        // let handNote = `<div id="odh-container-note"></div>`;
+        // content += `<div class="odh-definition">${button}${handNote}</div>`;
+
         return this.popupHeader() + content + this.popupFooter();
     }
 
@@ -276,9 +312,10 @@ class ODHFront {
                 <img id="fail" src="${chrome.runtime.getURL('fg/img/fail.png')}"/>
                 <img id="play" src="${chrome.runtime.getURL('fg/img/play.png')}"/>
             </div>
-            <script src="${chrome.runtime.getURL('fg/js/frame.js')}"></script>
-            <script src="${chrome.runtime.getURL('fg/js/spell.js')}"></script>
-            <script>document.querySelector('#odh-container').appendChild(spell())</script>
+            <script src="${chrome.runtime.getURL('fg/js/frame.sintak.js')}"></script>
+            <script src="${chrome.runtime.getURL('fg/js/spell.sintak.js')}"></script>
+            <script>document.querySelector('#odh-container-note').appendChild(spell('spell-content-note'))</script>
+            <script>document.querySelector('#odh-container').appendChild(spell('spell-content'))</script>
             <script>document.querySelector('.spell-content').innerHTML="${this.sentence}"</script>
             <script>${monolingual}</script>
             </body>

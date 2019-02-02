@@ -23,11 +23,13 @@
     "content_scripts": [{
         "matches": ["*://*/*", "file://*/*"],
         "js": [
+            "fg/js/comm.js",
+
             "fg/js/api.js",
             "fg/js/popup.js",
             "fg/js/range.js",
-            "fg/js/text.js",
-            "fg/js/frontend.js"
+            "fg/js/text.sintak.js",
+            "fg/js/frontend.sintak.js"
         ],
         "css": ["fg/css/client.css"]
     }],
@@ -42,8 +44,8 @@
     "web_accessible_resources": [
         "fg/css/frame.css",
         "fg/css/spell.css",
-        "fg/js/frame.js",
-        "fg/js/spell.js",
+        "fg/js/frame.sintak.js",
+        "fg/js/spell.sintak.js",
         "fg/font/spell-icons.ttf",
         "fg/font/spell-icons.woff",
         "fg/img/play.png",
