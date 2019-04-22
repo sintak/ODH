@@ -46,6 +46,26 @@ function cutSentence(word, sentence, sentenceNum) {
     }
 }
 
+/**
+ * 切分文本块到句子
+ *
+ * @param {*} text 文本块/段落
+ * @returns
+ */
+function cutToSentences(text) {
+    // console.log("cutToSentences", [text]);
+
+    // "At least you got a good story out of it, right? Hello world!! Hello world. How are you... P.M. Because I knew at some point I' d be...".match(/\. |\? |! |; /g)
+    var regText = "\\. |\\? |! |; ";
+    var reg = new RegExp(regText);
+    var regG = new RegExp(regText, "g");
+    var puncts = text.match(regG) || [];  // ["? ", "! ", ". ", ". ", ". "]
+    let sentences = text.split(reg).filter(s => s.trim() !== '').map((s, index) => s + `${puncts[index] || ''}`);
+    // console.log(sentences, sentences.reduce((value1, value2) => value1 + value2).length == text.length);
+
+    return sentences;
+}
+
 function getSentence(sentenceNum) {
     let sentence = '';
     const upNum = 4;
@@ -68,7 +88,39 @@ function getSentence(sentenceNum) {
         sentence = node.innerText;
     }
 
-    return cutSentence(word, sentence, sentenceNum);
+    // return cutSentence(word, sentence, sentenceNum);
+    var sentences = cutToSentences(sentence);
+    
+    /// 选择了的若干句子的索引
+    var start = Math.min(selection.anchorOffset, selection.focusOffset);
+    var end = Math.max(selection.anchorOffset, selection.focusOffset);
+    var count = 0;
+    var selectionSentenceIndexes = [];
+    for (let index = 0; index < sentences.length; index++) {
+        const element = sentences[index];
+        count += element.length;
+        if (count >= start+1 || count >= end+1) {
+            selectionSentenceIndexes.push(index);
+        }
+        if (count >= end+1) {
+            break;
+        }
+    }
+
+    /// 合并选择的到句子
+    var block = "";
+    for (let index = 0; index < sentences.length; index++) {
+        if (selectionSentenceIndexes.indexOf(index) >= 0) {
+            const element = sentences[index];
+            block += element;
+        }
+    }
+
+    // TODO 上下文
+    // var preBlock = 
+    // var nextBlock = 
+
+    return block.trim();
 }
 
 function getBlock(node, deep) {

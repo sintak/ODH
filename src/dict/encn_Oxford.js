@@ -85,14 +85,34 @@ class encn_Oxford {
                     dis = (chn_dis && eng_dis) ? `<div class="dis"><span class="eng_dis">${eng_dis}</span><span class="chn_dis">${chn_dis}</span></div>` : '';
                 }
                 if (segement.classList && segement.classList.contains('se_lis')) {
-                    let eng_tran = T(segement.querySelector('.val'));
+                    // let eng_tran = T(segement.querySelector('.val'));  // by sintak
+                    let eng_tran = (() => {
+                        var nodes = segement.querySelectorAll(".val");
+                        var text = '';
+                        for(var node of nodes) {
+                            if(node.className.indexOf("label") >= 0) {
+                                text += node != null ? ' <strong>' + node.innerText.trim() + '</strong> ' : '';	
+                            } else {
+                                text += node != null ? node.innerText.trim() : '';
+                            }
+                        }
+                        return text;
+                    })();
                     let chn_tran = T(segement.querySelector('.bil'));
                     if (!eng_tran || !chn_tran) continue;
                     if (definition) {
                         definitions.push(definition);
                         definition = '';
                     }
-                    let grammar = T(segement.querySelector('.gra'));
+                    // let grammar = T(segement.querySelector('.gra'));
+                    let grammar = (() => {
+                        var nodes = segement.querySelectorAll(".gra");
+                        var text = '';
+                        for(var node of nodes) {
+                            text += node != null ? node.innerText.trim() : '';
+                        }
+                        return text;
+                    })();
                     grammar = grammar ? `<span class="grammar">${grammar}</span>` : '';
                     let informal = T(segement.querySelector('.infor'));
                     informal = informal ? `<span class="informal">${informal}</span>` : '';
@@ -100,7 +120,7 @@ class encn_Oxford {
                     complement = complement ? `<span class="complement">${complement}</span>` : '';
                     eng_tran = `<span class='eng_tran'>${eng_tran.replace(RegExp(expression, 'gi'),`<b>${expression}</b>`)}</span>`;
                     chn_tran = `<span class='chn_tran'>${chn_tran}</span>`;
-                    definition += `${dis}${pos}${grammar}${complement}${informal}<span class='tran'>${eng_tran}${chn_tran}</span>`;
+                    definition += `${dis}${pos}${grammar}${complement}${informal}<span class='tran'>${chn_tran}${eng_tran}</span>`;
                 }
                 if (segement.classList && segement.classList.contains('li_exs')) {
                     let examps = segement.querySelectorAll('.li_ex') || [];
@@ -133,7 +153,7 @@ class encn_Oxford {
                 let definition = '';
                 eng_tran = eng_tran ? `<span class='eng_tran'>${eng_tran}</span>` : '';
                 chn_tran = chn_tran ? `<span class='chn_tran'>${chn_tran}</span>` : '';
-                definition += `${idmphrase}<span class='tran'>${eng_tran}${chn_tran}</span>`;
+                definition += `${idmphrase}<span class='tran'>${chn_tran}${eng_tran}</span>`;
                 // make exmaple segement
                 let eng_examp = T(idmblock.querySelector('.val_ex'));
                 let chn_examp = T(idmblock.querySelector('.bil_ex'));

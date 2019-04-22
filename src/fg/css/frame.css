@@ -116,3 +116,8 @@ hr {
   text-decoration: none;
   text-align: center;
 }
+
+strong {
+  color: #c00;
+  font-weight: normal;
+}

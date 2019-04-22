@@ -84,7 +84,7 @@ class ODHFront {
             this.onSelectionEnd(e);
             //var selEndEvent = new CustomEvent('selectionend');
             //window.dispatchEvent(selEndEvent);
-        }, 500);
+        }, /*500*/1000);
     }
 
     async onSelectionEnd(e) {
@@ -316,7 +316,7 @@ class ODHFront {
             <script src="${chrome.runtime.getURL('fg/js/spell.sintak.js')}"></script>
             <script>document.querySelector('#odh-container-note').appendChild(spell('spell-content-note'))</script>
             <script>document.querySelector('#odh-container').appendChild(spell('spell-content'))</script>
-            <script>document.querySelector('.spell-content').innerHTML="${this.sentence}"</script>
+            <script>document.querySelector('.spell-content').innerHTML="${this.sentence.replace(/"/g, '\\"').replace(/'/g, "\\'")}";</script>
             <script>${monolingual}</script>
             </body>
         </html>`;

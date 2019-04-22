@@ -77,7 +77,7 @@ function onDomContentLoaded() {
     registerAddNoteLinks();
     registerAudioLinks();
     registerSoundLinks();
-    registerHiddenClass();
+    // registerHiddenClass();// comment by sintak
 }
 
 function onMessage(e) {
